@@ -41,7 +41,7 @@ SPEfun = function(matrix,rowIndex=1){
 
 #' Precision function
 #'
-#' This function calculates the precision of your classifier. It's expressed by 'true positive / sum(true positives and negatives)' (on binary cases, 'TP / (TN + TP)').
+#' This function calculates the precision of your classifier. It's expressed by 'true positive / sum(true and false positives)' (on binary cases, 'TP / (FP + TP)').
 #' @param matrix a confusion matrix with the data of your prediction versus realized.
 #' @param rowIndex the index of the row you wish to calculate the precision. By default, in binary cases, the row will be the last one.
 #' @keywords precision
@@ -50,7 +50,7 @@ SPEfun = function(matrix,rowIndex=1){
 #' PREfun()
 
 PREfun = function(matrix,rowIndex=nrow(matrix)){
-  return(matrix[rowIndex,rowIndex]/sum(diag(matrix)))
+  return(matrix[rowIndex,rowIndex]/sum(matrix[,rowIndex]))
 }
 
 #' Recall function
