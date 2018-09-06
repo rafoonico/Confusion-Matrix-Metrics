@@ -9,7 +9,7 @@
 #' cm()
 
 cm = function(predict,trueValues){
-  return(table(trueValues, predict))
+  as.matrix(table(trueValues, predict))
 }
 
 #' Accuracy function
@@ -22,7 +22,7 @@ cm = function(predict,trueValues){
 #' ACCfun()
 
 ACCfun = function(matrix){
-  return(sum(diag(matrix))/sum(matrix))
+  sum(diag(matrix))/sum(matrix)
 }
 
 #' Specificity function
@@ -36,7 +36,7 @@ ACCfun = function(matrix){
 #' PREfun()
 
 SPEfun = function(matrix,rowIndex=1){
-  return(sum(diag(matrix)[-rowIndex])/sum(matrix[-rowIndex,]))
+  sum(diag(matrix)[-rowIndex])/sum(matrix[-rowIndex,])
 }
 
 #' Precision function
@@ -50,7 +50,7 @@ SPEfun = function(matrix,rowIndex=1){
 #' PREfun()
 
 PREfun = function(matrix,rowIndex=nrow(matrix)){
-  return(matrix[rowIndex,rowIndex]/sum(matrix[,rowIndex]))
+  matrix[rowIndex,rowIndex]/sum(matrix[,rowIndex])
 }
 
 #' Recall function
@@ -64,7 +64,7 @@ PREfun = function(matrix,rowIndex=nrow(matrix)){
 #' RECfun()
 
 RECfun = function(matrix,rowIndex=nrow(matrix)){
-  return(matrix[rowIndex,rowIndex]/sum(matrix[rowIndex,]))
+  matrix[rowIndex,rowIndex]/sum(matrix[rowIndex,])
 }
 
 #' F1 Score function
@@ -78,7 +78,7 @@ RECfun = function(matrix,rowIndex=nrow(matrix)){
 #' F1fun()
 
 F1fun = function(matrix,rowIndex=nrow(matrix)){
-  pre=matrix[rowIndex,rowIndex]/sum(diag(matrix))
+  pre=matrix[rowIndex,rowIndex]/sum(matrix[,rowIndex])
   rec=matrix[rowIndex,rowIndex]/sum(matrix[rowIndex,])
   return(2*pre*rec/(pre+rec))
 }
@@ -94,7 +94,7 @@ F1fun = function(matrix,rowIndex=nrow(matrix)){
 #' FNRfun()
 
 FNRfun = function(matrix,rowIndex=nrow(matrix)){
-  return(sum(matrix[rowIndex,-rowIndex])/sum(matrix[rowIndex,]))
+  sum(matrix[rowIndex,-rowIndex])/sum(matrix[rowIndex,])
 }
 
 #' False positive rate function
@@ -108,7 +108,9 @@ FNRfun = function(matrix,rowIndex=nrow(matrix)){
 #' FPRfun()
 
 FPRfun = function(matrix,rowIndex=nrow(matrix)){
-  m=matrix[-rowIndex,]
+  m=as.matrix(matrix[-rowIndex,])
   return(sum(m[row(m)!=col(m)])/sum(m))
 }
+
+
 
