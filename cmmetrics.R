@@ -36,7 +36,7 @@ ACCfun = function(matrix){
 #' PREfun()
 
 SPEfun = function(matrix,rowIndex=1){
-  sum(diag(matrix)[-rowIndex])/sum(matrix[-rowIndex,])
+  sum(matrix[rowIndex,-rowIndex])/sum(matrix[-rowIndex,])
 }
 
 #' Precision function
