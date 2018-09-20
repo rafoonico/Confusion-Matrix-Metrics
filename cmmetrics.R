@@ -1,6 +1,10 @@
 #' Confusion Matrix
 #'
-#' This function creates the confusion matrix.
+#' This function creates the confusion matrix. Apart from the most material you will find in the literature, this confusion matrix is composed as it follows:
+#'           predict
+#'trueValues  0   1
+#'         0 TN  FP
+#'         1 FN  TP
 #' @param predict a vector with the predicted results.
 #' @param trueValues the true values observed for the response variable.
 #' @keywords accuracy
@@ -36,7 +40,7 @@ ACCfun = function(matrix){
 #' PREfun()
 
 SPEfun = function(matrix,rowIndex=1){
-  sum(matrix[rowIndex,-rowIndex])/sum(matrix[-rowIndex,])
+  sum(matrix[rowIndex,rowIndex])/sum(matrix[rowIndex,])
 }
 
 #' Precision function
