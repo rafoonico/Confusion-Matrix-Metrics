@@ -1,24 +1,37 @@
 #' Confusion Matrix
 #'
-#' This function creates the confusion matrix. Apart from the most material you will find in the literature, this confusion matrix is composed as it follows:
-#'           predict
-#'trueValues  0   1
-#'         0 TN  FP
-#'         1 FN  TP
-#' @param predict a vector with the predicted results.
-#' @param trueValues the true values observed for the response variable.
-#' @keywords accuracy
+#' This function creates the confusion matrix as it follows:
+#'         realValues
+#'predicted  Positive Negative
+#'  Positive       TP       FP
+#'  Negative       FN       TN
+#'
+#' @param predicted a vector with the predicted results. As default, the values must be 0 for negative outcomes and 1 for positive outcomes. Otherwise, they must be specified with "diffValues=TRUE".
+#' @param realValues the real values observed for the response variable. As default, the values must be 0 for negative outcomes and 1 for positive outcomes. Otherwise, they must be specified with "diffValues=TRUE".
+#' @param diffValues if TRUE, the user have to declare which outcome is the positive one (i.e: the event of interest).
+#' @param positiveIfDiff the positive outcome if 'diffValues=TRUE'
+#' @keywords confusion matrix
 #' @export
 #' @examples
 #' cm()
 
-cm = function(predict,trueValues){
-  as.matrix(table(trueValues, predict))
+cm = function(predicted,realValues,diffValues = FALSE, positiveIfDiff){
+  if(diffValues==FALSE && !(c(0,1) %in% predicted && c(0,1) %in% realValues)){
+    stop("Values must be 0 or 1. Otherwise, you must declare 'diffValues=TRUE' and the positive value in 'positiveIfDiff'.")
+  }else if(diffValues==TRUE){
+    predicted <- factor(ifelse(predicted==positiveIfDiff,"Positive","Negative"),levels=c("Positive","Negative"))
+    realValues <- factor(ifelse(realValues==positiveIfDiff,"Positive","Negative"),levels=c("Positive","Negative"))
+    return(table(predicted,realValues))
+  }else{
+    predicted <- factor(ifelse(predicted==1,"Positive","Negative"),levels=c("Positive","Negative"))
+    realValues <- factor(ifelse(realValues==1,"Positive","Negative"),levels=c("Positive","Negative"))
+    return(table(predicted,realValues))
+  }
 }
 
 #' Accuracy function
 #'
-#' This function calculates the accuracy of your classifier. It's expressed by 'sum(main diagonal) / sum(whole matrix)' (on binary cases, '(TP + TN)/(TP + FP + TN + FN)').
+#' This function calculates the accuracy of your classifier. It's expressed by '(TP + TN)/(TP + FP + TN + FN)'.
 #' @param matrix a confusion matrix with the data of your prediction versus realized.
 #' @keywords accuracy
 #' @export
@@ -26,94 +39,87 @@ cm = function(predict,trueValues){
 #' ACCfun()
 
 ACCfun = function(matrix){
-  sum(diag(matrix))/sum(matrix)
+  return(sum(diag(matrix))/sum(matrix))
 }
 
 #' Specificity function
 #'
-#' This function calculates the specificity (a.k.a. true negative rate) of your classifier. It's expressed by 'sum(true negatives) / sum(true negatives and false positives)' (on binary cases, 'TN / (TN + FP)').
+#' This function calculates the specificity (a.k.a. true negative rate) of your classifier. It's expressed by 'TN / (TN + FP)'.
 #' @param matrix a confusion matrix with the data of your prediction versus realized.
-#' @param rowIndex the index of the row you wish to calculate the specificity. By default, in binary cases, the row will be the first one.
 #' @keywords specificity true negative rate
 #' @export
 #' @examples
-#' PREfun()
+#' SPEfun()
 
-SPEfun = function(matrix,rowIndex=1){
-  sum(matrix[rowIndex,rowIndex])/sum(matrix[rowIndex,])
+SPEfun = function(matrix){
+  return(matrix["Negative","Negative"]/sum(matrix[,"Negative"]))
 }
 
 #' Precision function
 #'
-#' This function calculates the precision of your classifier. It's expressed by 'true positive / sum(true and false positives)' (on binary cases, 'TP / (FP + TP)').
+#' This function calculates the precision of your classifier. It's expressed by 'TP / (FP + TP)'.
 #' @param matrix a confusion matrix with the data of your prediction versus realized.
-#' @param rowIndex the index of the row you wish to calculate the precision. By default, in binary cases, the row will be the last one.
 #' @keywords precision
 #' @export
 #' @examples
 #' PREfun()
 
-PREfun = function(matrix,rowIndex=nrow(matrix)){
-  matrix[rowIndex,rowIndex]/sum(matrix[,rowIndex])
+PREfun = function(matrix){
+  return(matrix["Positive","Positive"]/sum(matrix["Positive",]))
 }
 
 #' Recall function
 #'
-#' This function calculates the recall (a.k.a. sensitivity or true positive rate) score of your classifier. It's expressed by 'true positive / sum(true positives and false negatives)' (on binary cases, 'TP / (TP + FN)')
+#' This function calculates the recall (a.k.a. sensitivity or true positive rate) score of your classifier. It's expressed by 'TP / (TP + FN)'.
 #' @param matrix a confusion matrix with the data of your prediction versus realized.
-#' @param rowIndex the index of the row you wish to calculate the recall. By default, in binary cases, the row will be the last one.
 #' @keywords recall sensitivity true positive rate
 #' @export
 #' @examples
 #' RECfun()
 
-RECfun = function(matrix,rowIndex=nrow(matrix)){
-  matrix[rowIndex,rowIndex]/sum(matrix[rowIndex,])
+RECfun = function(matrix){
+  return(matrix["Positive","Positive"]/sum(matrix[,"Positive"]))
 }
 
 #' F1 Score function
 #'
 #' This function calculates the F1 score of your classifier. It's expressed by the harmonic mean between 'precision' and 'recall' scores: '2 x Precision x Recall / (Precision + Recall)'.
 #' @param matrix a confusion matrix with the data of your prediction versus realized.
-#' @param rowIndex the index of the row you wish to calculate the F1 Score. By default, in binary cases, the row will be the last one.
 #' @keywords F1 Score
 #' @export
 #' @examples
 #' F1fun()
 
-F1fun = function(matrix,rowIndex=nrow(matrix)){
-  pre=matrix[rowIndex,rowIndex]/sum(matrix[,rowIndex])
-  rec=matrix[rowIndex,rowIndex]/sum(matrix[rowIndex,])
+F1fun = function(matrix){
+  pre=matrix["Positive","Positive"]/sum(matrix["Positive",])
+  rec=matrix["Positive","Positive"]/sum(matrix[,"Positive"])
   return(2*pre*rec/(pre+rec))
 }
 
 #' False negative rate function
 #'
-#' This function calculates the false negative rate (a.k.a. type I error) of your classifier. It's expressed by 'sum(false negatives in a row) / sum(whole line)' (on binary cases, 'FN / (FN + TP)').
+#' This function calculates the false negative rate (a.k.a. type I error) of your classifier. It's expressed by 'FN / (FN + TP)'.
 #' @param matrix a confusion matrix with the data of your prediction versus realized.
-#' @param rowIndex the index of the row you wish to calculate the false negative rate. By default, in binary cases, the row will be the last one.
 #' @keywords false negative rate error type I
 #' @export
 #' @examples
 #' FNRfun()
 
-FNRfun = function(matrix,rowIndex=nrow(matrix)){
-  sum(matrix[rowIndex,-rowIndex])/sum(matrix[rowIndex,])
+FNRfun = function(matrix){
+  return(sum(matrix["Negative","Positive"])/sum(matrix[,"Positive"]))
 }
 
 #' False positive rate function
 #'
-#' This function calculates the false positive rate (a.k.a. type II error) of your classifier. It's expressed by 'sum(false positives in each row) / sum(whole lines)' (on binary cases, 'FP / (FP + TN)').
+#' This function calculates the false positive rate (a.k.a. type II error) of your classifier. It's expressed by 'FP / (FP + TN)'.
 #' @param matrix a confusion matrix with the data of your prediction versus realized.
-#' @param rowIndex the index of the row you wish to calculate the false positive rate. By default, in binary cases, the row will be the last one.
 #' @keywords false positive rate error type II
 #' @export
 #' @examples
 #' FPRfun()
 
-FPRfun = function(matrix,rowIndex=nrow(matrix)){
-  m=as.matrix(matrix[-rowIndex,])
-  return(sum(m[row(m)!=col(m)])/sum(m))
+FPRfun = function(matrix){
+  return(sum(matrix["Positive","Negative"])/sum(matrix[,"Negative"]))
 }
 
 
